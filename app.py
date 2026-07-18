@@ -2,6 +2,7 @@ import streamlit as st
 import database as db
 import urllib.parse
 import datetime
+import re
 
 # --- CONFIGURATION ---
 st.set_page_config(
@@ -119,9 +120,14 @@ with st.container():
 
     st.markdown("---")
     
-    if st.button("Book Now & Confirm on WhatsApp", width='stretch'):
+    if st.button("Book Now & Confirm on WhatsApp", use_container_width=True):
+        # Basic validation for phone (at least 10 digits, optional +)
+        phone_valid = re.match(r'^\+?[\d\s\-]{10,}$', phone)
+        
         if not name or not phone:
-            st.error("Please fill in the patient's name and WhatsApp number.")
+            st.error("Please fill in both the patient's name and WhatsApp number.")
+        elif not phone_valid:
+            st.error("Please enter a valid phone number (at least 10 digits).")
         else:
             # Add transport info to the service type for the DB record
             db_service = f"{service_type} (Transport: {'Yes' if need_transport else 'No'})"
@@ -141,12 +147,21 @@ with st.container():
             # Display success message and link
             st.markdown(f"""
                 <div class="booking-success">
-                    <h3 style="margin-bottom: 10px;">✅ Booking Successful!</h3>
+                    <h3 style="margin-bottom: 10px;">✅ Step 1 Complete!</h3>
                     <p style="font-size: 1.1rem; margin-bottom: 5px;">Your appointment has been securely recorded.</p>
-                    <p>Please click the button below to send us your details on WhatsApp and finalize your booking.</p>
+                    <p>Redirecting you to WhatsApp to finalize your slot. If nothing happens, click the button below.</p>
                     <a href="{whatsapp_url}" target="_blank">
                         Complete via WhatsApp 💬
                     </a>
                 </div>
             """, unsafe_allow_html=True)
-
+            
+            # Auto-redirect via JS injection
+            st.components.v1.html(
+                f"""
+                <script>
+                    window.open('{whatsapp_url}', '_blank');
+                </script>
+                """,
+                height=0,
+            )
