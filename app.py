@@ -136,7 +136,7 @@ with st.container():
             booking_id = db.add_booking(name, phone, db_service, date, time_display)
             
             # Format WhatsApp message
-            business_phone = "919892768818" # Phone number from the Next.js page
+            business_phone = "919315765731" # Updated phone number
             
             transport_text = "Yes, please arrange pickup." if need_transport else "No transport needed."
             message = f"Hello Pinky Sharma!\n\nI would like to confirm my diagnostic test booking (ID: {booking_id}).\n\n*Patient Name:* {name}\n*Test:* {service_type}\n*Date:* {date.strftime('%B %d, %Y')}\n*Time:* {time_display}\n*Free Transport:* {transport_text}\n\nThank you!"
